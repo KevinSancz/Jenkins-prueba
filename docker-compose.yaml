@@ -1,0 +1,8 @@
+version: "2.27.0"  # Versión de la especificación de Docker Compose
+services:
+  mi-app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=dev
