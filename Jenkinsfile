@@ -5,7 +5,7 @@ pipeline {
         // Ajusta según tu región y namespace de OCI
         OCI_REGISTRY  = 'iad.ocir.io'
         OCI_NAMESPACE = ':<zB88.[)r>qF4LrMJHi'           // tu namespace en OCI
-        IMAGE_NAME    = 'repositorio_jenkins_emma' // el nombre de tu imagen local
+        IMAGE_NAME    = 'jenkins_prueba' // el nombre de tu imagen local
     }
 
     stages {
