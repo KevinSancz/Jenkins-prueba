@@ -4,7 +4,7 @@ pipeline {
     environment {
         OCI_REGISTRY  = 'iad.ocir.io'
         OCI_NAMESPACE = 'idxyojfomq6q'          // <-- tu namespace real
-        IMAGE_NAME    = 'jenkins_prueba'
+        IMAGE_NAME    = 'prueba-jenkins-mi-app'
     }
 
     stages {
