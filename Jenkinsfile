@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Ajusta según tu región y namespace de OCI
         OCI_REGISTRY  = 'iad.ocir.io'
-        OCI_NAMESPACE = 'idxyojfomq6q'           // tu namespace en OCI
+        OCI_NAMESPACE = ':<zB88.[)r>qF4LrMJHi'           // tu namespace en OCI
         IMAGE_NAME    = 'repositorio_jenkins_emma' // el nombre de tu imagen local
     }
 
