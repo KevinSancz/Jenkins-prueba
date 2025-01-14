@@ -33,13 +33,13 @@ pipeline {
             steps {
                 // 1) Iniciar sesión en OCIR con credenciales guardadas en Jenkins
                 withCredentials([usernamePassword(
-                    credentialsId: 'OCIR_DOCKER_CREDS',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    credentialsId: '15050001',
+                    usernameVariable: 'idxyojfomq6q/oracleidentitycloudservice/kevin.sanchez@ebiw.mx',
+                    passwordVariable: 'ig}g0;66xL#}Uz1iGC10'
                 )]) {
                     sh """
-                      echo "\$DOCKER_PASS" | docker login \\
-                        -u "\$DOCKER_USER" \\
+                      echo "\$ig}g0;66xL#}Uz1iGC10" | docker login \\
+                        -u "\$idxyojfomq6q/oracleidentitycloudservice/kevin.sanchez@ebiw.mx" \\
                         --password-stdin \\
                         \${OCI_REGISTRY}
                     """
