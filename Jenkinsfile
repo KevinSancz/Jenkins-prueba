@@ -2,10 +2,9 @@ pipeline {
     agent any
     
     environment {
-        // Ajusta según tu región y namespace de OCI
         OCI_REGISTRY  = 'iad.ocir.io'
-        OCI_NAMESPACE = ':<zB88.[)r>qF4LrMJHi'           // tu namespace en OCI
-        IMAGE_NAME    = 'jenkins_prueba' // el nombre de tu imagen local
+        OCI_NAMESPACE = 'idxyojfomq6q'          // <-- tu namespace real
+        IMAGE_NAME    = 'jenkins_prueba'
     }
 
     stages {
@@ -24,7 +23,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh "docker compose down -v"
-                // --build se encarga de construir la imagen local (IMAGE_NAME)
                 sh "docker compose up -d --build"
             }
         }
@@ -33,7 +31,7 @@ pipeline {
             steps {
                 // 1) Iniciar sesión en OCIR con credenciales guardadas en Jenkins
                 withCredentials([usernamePassword(
-                    credentialsId: '15050001',   // El ID exacto que pusiste en Jenkins
+                    credentialsId: '15050001',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
