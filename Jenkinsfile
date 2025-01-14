@@ -39,7 +39,7 @@ pipeline {
                 )]) {
                     sh """
                       echo "\$ig}g0;66xL#}Uz1iGC10" | docker login \\
-                        -u "\$idxyojfomq6q/kevin.sanchez@ebiw.mx" \\
+                        -u "\$idxyojfomq6q/oracleidentitycloudservice/kevin.sanchez@ebiw.mx" \\
                         --password-stdin \\
                         \${OCI_REGISTRY}
                     """
