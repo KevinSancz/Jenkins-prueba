@@ -4,8 +4,8 @@ pipeline {
     environment {
         // Ajusta según tu región y namespace de OCI
         OCI_REGISTRY  = 'iad.ocir.io'
-        OCI_NAMESPACE = 'idxyojfomq6q' // tu namespace en OCI
-        IMAGE_NAME    = 'repositorio_jenkins_emma'   // nombre de tu imagen local
+        OCI_NAMESPACE = 'idxyojfomq6q'           // tu namespace en OCI
+        IMAGE_NAME    = 'repositorio_jenkins_emma' // el nombre de tu imagen local
     }
 
     stages {
@@ -33,13 +33,13 @@ pipeline {
             steps {
                 // 1) Iniciar sesión en OCIR con credenciales guardadas en Jenkins
                 withCredentials([usernamePassword(
-                    credentialsId: '15050001',
-                    usernameVariable: 'idxyojfomq6q/kevin.sanchez@ebiw.mx',
-                    passwordVariable: 'ig}g0;66xL#}Uz1iGC10'
+                    credentialsId: '15050001',   // El ID exacto que pusiste en Jenkins
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh """
-                      echo "\$ig}g0;66xL#}Uz1iGC10" | docker login \\
-                        -u "\$idxyojfomq6q/oracleidentitycloudservice/kevin.sanchez@ebiw.mx" \\
+                      echo "\$DOCKER_PASS" | docker login \\
+                        -u "\$DOCKER_USER" \\
                         --password-stdin \\
                         \${OCI_REGISTRY}
                     """
