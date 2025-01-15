@@ -61,8 +61,22 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        def token = sh(script: "oci ce cluster generate-token --cluster-id ocid1.cluster.oc1.iad.aaaaaaaaq4k6vopup3yyac3776sfrbr47jm2qp5j7db2upvmdcbwqn2rc55q --region us-ashburn-1 | jq -r '.status.token'", returnStdout: true).trim()
-                        withEnv(["KUBECONFIG=${KUBECONFIG}", "KUBE_TOKEN=${token}"]) {
+                        // Generar el token de acceso dinámicamente
+                        def kubeToken = sh(
+                            script: """
+                                oci ce cluster generate-token \
+                                    --cluster-id ocid1.cluster.oc1.iad.aaaaaaaaq4k6vopup3yyac3776sfrbr47jm2qp5j7db2upvmdcbwqn2rc55q \
+                                    --region iad | jq -r '.status.token'
+                            """,
+                            returnStdout: true
+                        ).trim()
+                        
+                        if (!kubeToken) {
+                            error "Failed to generate Kubernetes token. Verify OCI credentials and cluster configuration."
+                        }
+
+                        // Usar el token y aplicar los manifiestos
+                        withEnv(["KUBECONFIG=${KUBECONFIG}", "KUBE_TOKEN=${kubeToken}"]) {
                             sh """
                                 # Clonar el repositorio para obtener los manifiestos
                                 rm -rf temp_repo || true
