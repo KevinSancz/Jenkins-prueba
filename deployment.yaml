@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-pruebas-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jenkins-pruebas
+  template:
+    metadata:
+      labels:
+        app: jenkins-pruebas
+    spec:
+      containers:
+      - name: jenkins-pruebas
+        image: iad.ocir.io/idxyojfomq6q/jenkins_pruebas:${BUILD_NUMBER}
+        ports:
+        - containerPort: 80
