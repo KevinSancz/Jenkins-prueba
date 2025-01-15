@@ -5,6 +5,7 @@ pipeline {
         OCI_REGISTRY  = 'iad.ocir.io'               // Ajusta según tu región
         OCI_NAMESPACE = 'idxyojfomq6q'             // Namespace en OCI
         IMAGE_NAME    = 'jenkins_pruebas'          // Repositorio en OCI
+        REPO_URL      = 'https://github.com/KevinSancz/Jenkins-prueba.git' // URL del repositorio
     }
 
     stages {
@@ -58,6 +59,10 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh """
+                        # Clonar el repositorio para obtener los manifiestos
+                        rm -rf temp_repo || true
+                        git clone ${REPO_URL} temp_repo
+
                         # Crea un secreto de Docker en el clúster OKE para autenticación con el Container Registry
                         kubectl create secret docker-registry oci-registry-secret \
                             --docker-server=${OCI_REGISTRY} \
@@ -65,9 +70,12 @@ pipeline {
                             --docker-password=\$DOCKER_PASS \
                             --docker-email=kevin.sanchez@ebiw.mx || true
 
-                        # Aplica los archivos de despliegue de Kubernetes
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
+                        # Aplica los manifiestos de Kubernetes
+                        kubectl apply -f temp_repo/deployment.yaml
+                        kubectl apply -f temp_repo/service.yaml
+
+                        # Limpia el repositorio temporal
+                        rm -rf temp_repo
                     """
                 }
             }
