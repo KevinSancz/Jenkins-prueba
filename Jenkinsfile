@@ -6,6 +6,7 @@ pipeline {
         OCI_NAMESPACE = 'idxyojfomq6q'             // Namespace en OCI
         IMAGE_NAME    = 'jenkins_pruebas'          // Repositorio en OCI
         REPO_URL      = 'https://github.com/KevinSancz/Jenkins-prueba.git' // URL del repositorio
+        KUBECONFIG    = '/home/opc/.kube/config'   // Ruta del archivo kubeconfig en Jenkins
     }
 
     stages {
@@ -58,25 +59,28 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh """
-                        # Clonar el repositorio para obtener los manifiestos
-                        rm -rf temp_repo || true
-                        git clone ${REPO_URL} temp_repo
+                    withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                        sh """
+                            # Clonar el repositorio para obtener los manifiestos
+                            rm -rf temp_repo || true
+                            git clone ${REPO_URL} temp_repo
 
-                        # Crea un secreto de Docker en el clúster OKE para autenticación con el Container Registry
-                        kubectl create secret docker-registry oci-registry-secret \
-                            --docker-server=${OCI_REGISTRY} \
-                            --docker-username=\$DOCKER_USER \
-                            --docker-password=\$DOCKER_PASS \
-                            --docker-email=kevin.sanchez@ebiw.mx || true
+                            # Crea un secreto de Docker en el clúster OKE para autenticación con el Container Registry
+                            kubectl delete secret oci-registry-secret || true
+                            kubectl create secret docker-registry oci-registry-secret \
+                                --docker-server=${OCI_REGISTRY} \
+                                --docker-username=\$DOCKER_USER \
+                                --docker-password=\$DOCKER_PASS \
+                                --docker-email=kevin.sanchez@ebiw.mx
 
-                        # Aplica los manifiestos de Kubernetes
-                        kubectl apply -f temp_repo/deployment.yaml
-                        kubectl apply -f temp_repo/service.yaml
+                            # Aplica los manifiestos de Kubernetes con validación desactivada
+                            kubectl apply -f temp_repo/deployment.yaml --validate=false
+                            kubectl apply -f temp_repo/service.yaml --validate=false
 
-                        # Limpia el repositorio temporal
-                        rm -rf temp_repo
-                    """
+                            # Limpia el repositorio temporal
+                            rm -rf temp_repo
+                        """
+                    }
                 }
             }
         }
