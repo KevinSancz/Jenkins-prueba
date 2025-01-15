@@ -1,10 +1,10 @@
 pipeline {
     agent any
-    
+
     environment {
-        OCI_REGISTRY  = 'iad.ocir.io'
-        OCI_NAMESPACE = 'idxyojfomq6q'
-        IMAGE_NAME    = 'prueba-jenkins-mi-app'
+        OCI_REGISTRY  = 'iad.ocir.io'               // Ajusta según tu región
+        OCI_NAMESPACE = 'idxyojfomq6q'             // Namespace en OCI
+        IMAGE_NAME    = 'jenkins_pruebas'    // Repositorio en OCI
     }
 
     stages {
@@ -18,7 +18,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "docker compose down -v"
+                sh "docker compose down -v || true"
                 sh "docker compose up -d --build"
             }
         }
@@ -44,9 +44,18 @@ pipeline {
             }
         }
 
+        stage('Validate Image') {
+            steps {
+                sh "docker run --rm ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:${BUILD_NUMBER} echo 'Image is working!'"
+            }
+        }
+
         stage('Cleanup') {
             steps {
-                sh "docker rmi ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                sh """
+                   docker rmi ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:${BUILD_NUMBER} || true
+                   docker rmi ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:latest || true
+                """
             }
         }
     }
