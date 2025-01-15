@@ -66,16 +66,16 @@ pipeline {
                             git clone ${REPO_URL} temp_repo
 
                             # Crea un secreto de Docker en el clúster OKE para autenticación con el Container Registry
-                            kubectl delete secret oci-registry-secret || true
-                            kubectl create secret docker-registry oci-registry-secret \
+                            sudo kubectl delete secret oci-registry-secret || true
+                            sudo kubectl create secret docker-registry oci-registry-secret \
                                 --docker-server=${OCI_REGISTRY} \
                                 --docker-username=\$DOCKER_USER \
                                 --docker-password=\$DOCKER_PASS \
                                 --docker-email=kevin.sanchez@ebiw.mx
 
                             # Aplica los manifiestos de Kubernetes con validación desactivada
-                            kubectl apply -f temp_repo/deployment.yaml --validate=false
-                            kubectl apply -f temp_repo/service.yaml --validate=false
+                            sudo kubectl apply -f temp_repo/deployment.yaml --validate=false
+                            sudo kubectl apply -f temp_repo/service.yaml --validate=false
 
                             # Limpia el repositorio temporal
                             rm -rf temp_repo
