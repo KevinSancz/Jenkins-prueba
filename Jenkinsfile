@@ -62,17 +62,26 @@ pipeline {
                 )]) {
                     script {
                         // Generar el token de acceso dinámicamente
-                        def kubeToken = sh(
+                        def kubeTokenJson = sh(
                             script: """
                                 oci ce cluster generate-token \
                                     --cluster-id ocid1.cluster.oc1.iad.aaaaaaaaq4k6vopup3yyac3776sfrbr47jm2qp5j7db2upvmdcbwqn2rc55q \
-                                    --region iad | jq -r '.status.token'
+                                    --region iad
                             """,
                             returnStdout: true
                         ).trim()
-                        
+
+                        if (!kubeTokenJson || !kubeTokenJson.contains("token")) {
+                            error "Failed to generate Kubernetes token. Verify OCI CLI and cluster configuration."
+                        }
+
+                        def kubeToken = sh(
+                            script: "echo '${kubeTokenJson}' | jq -r '.status.token'",
+                            returnStdout: true
+                        ).trim()
+
                         if (!kubeToken) {
-                            error "Failed to generate Kubernetes token. Verify OCI credentials and cluster configuration."
+                            error "Failed to extract token from JSON. Verify jq installation and JSON structure."
                         }
 
                         // Usar el token y aplicar los manifiestos
