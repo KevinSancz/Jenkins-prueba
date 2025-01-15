@@ -17,3 +17,22 @@ spec:
         image: iad.ocir.io/idxyojfomq6q/jenkins_pruebas:${BUILD_NUMBER}
         ports:
         - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10

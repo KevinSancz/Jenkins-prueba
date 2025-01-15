@@ -22,6 +22,7 @@ pipeline {
             steps {
                 sh "docker compose down -v || true"
                 sh "docker compose up -d --build"
+                sh "docker compose ps" // Validar que los servicios están corriendo
             }
         }
 
@@ -65,7 +66,10 @@ pipeline {
                             rm -rf temp_repo || true
                             git clone ${REPO_URL} temp_repo
 
-                            # Crea un secreto de Docker en el clúster OKE para autenticación con el Container Registry
+                            # Reemplazar ${BUILD_NUMBER} en deployment.yaml
+                            sed -i "s/\\\${BUILD_NUMBER}/${BUILD_NUMBER}/g" temp_repo/deployment.yaml
+
+                            # Crear un secreto de Docker en el clúster OKE para OCI Registry
                             kubectl delete secret oci-registry-secret || true
                             kubectl create secret docker-registry oci-registry-secret \
                                 --docker-server=${OCI_REGISTRY} \
@@ -73,9 +77,12 @@ pipeline {
                                 --docker-password=\$DOCKER_PASS \
                                 --docker-email=kevin.sanchez@ebiw.mx
 
-                            # Aplica los manifiestos de Kubernetes con validación desactivada
-                            kubectl apply -f temp_repo/deployment.yaml --validate=false
-                            kubectl apply -f temp_repo/service.yaml --validate=false
+                            # Aplicar los manifiestos de Kubernetes
+                            kubectl apply -f temp_repo/deployment.yaml
+                            kubectl apply -f temp_repo/service.yaml
+
+                            # Validar que el despliegue está funcionando
+                            kubectl rollout status deployment/jenkins-pruebas-deployment || exit 1
 
                             # Limpia el repositorio temporal
                             rm -rf temp_repo
@@ -90,6 +97,7 @@ pipeline {
                 sh """
                    docker rmi ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:${BUILD_NUMBER} || true
                    docker rmi ${OCI_REGISTRY}/${OCI_NAMESPACE}/${IMAGE_NAME}:latest || true
+                   docker image prune -f || true
                 """
             }
         }
