@@ -7,6 +7,7 @@ pipeline {
         IMAGE_NAME    = 'jenkins_pruebas'          // Repositorio en OCI
         REPO_URL      = 'https://github.com/KevinSancz/Jenkins-prueba.git' // URL del repositorio
         KUBECONFIG    = '/home/opc/.kube/config'   // Ruta del archivo kubeconfig en Jenkins
+        OCI_CONFIG_FILE = '/var/lib/jenkins/.oci/config' // Ruta al archivo de configuración de OCI
     }
 
     stages {
@@ -61,9 +62,10 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        // Generar el token de acceso dinámicamente
+                        // Generar el token de acceso dinámicamente con configuración de OCI
                         def kubeTokenJson = sh(
                             script: """
+                                OCI_CONFIG_FILE=${OCI_CONFIG_FILE} \
                                 oci ce cluster generate-token \
                                     --cluster-id ocid1.cluster.oc1.iad.aaaaaaaaq4k6vopup3yyac3776sfrbr47jm2qp5j7db2upvmdcbwqn2rc55q \
                                     --region iad
