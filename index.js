@@ -2,7 +2,7 @@ const express = require('express');
 const personaRoute = require('./src/persona');
 
 const app = express();
-const port = process.env.PORT || 5010;
+const port = process.env.PORT || 80;
 
 //Definicion de Middleware
 app.use(express.json());
