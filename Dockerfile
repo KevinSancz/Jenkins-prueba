@@ -1,10 +1,19 @@
-FROM python:3.10-slim
+FROM node:16
 
-# Crea un archivo HTML básico
-RUN echo '<h1>¡Hola desde mi contenedor nuevesito!</h1>' > /usr/share/index.html
+# Crear directorio de la aplicación
+WORKDIR /usr/src/app
 
-# Expone el puerto 80
+# Copiar dependencias
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el código de la aplicación
+COPY . .
+
+# Exponer el puerto (debe coincidir con el puerto de tu app)
 EXPOSE 80
 
-# Comando para ejecutar un servidor HTTP
-CMD ["python", "-m", "http.server", "80", "--directory", "/usr/share"]
+# Comando para iniciar la aplicación
+CMD ["node", "index.js"]
