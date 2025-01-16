@@ -1,4 +1,10 @@
-FROM alpine:3.17
+FROM python:3.10-slim
 
-# Comando para imprimir el mensaje
-CMD ["sh", "-c", "echo '¡Hola desde mi contenedor nuevesito!' && tail -f /dev/null"]
+# Crea un archivo HTML básico
+RUN echo '<h1>¡Hola desde mi contenedor nuevesito!</h1>' > /usr/share/index.html
+
+# Expone el puerto 80
+EXPOSE 80
+
+# Comando para ejecutar un servidor HTTP
+CMD ["python", "-m", "http.server", "80", "--directory", "/usr/share"]
